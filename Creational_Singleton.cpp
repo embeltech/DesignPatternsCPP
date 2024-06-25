@@ -6,6 +6,7 @@ class mytest{
     int data;
     static mytest *instance;  
     mytest(int x):data(x){}  //Private CTOR to avoid 'new' operator object creation
+    ~mytest(){std::cout<<"DTOR called\n";} //Private DTOR to avoid 'delete' operation
 
   public:
     //delete copy CTOR and assignment operator to avoid copy creation
