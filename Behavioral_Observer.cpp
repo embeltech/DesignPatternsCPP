@@ -1,7 +1,7 @@
 #include <iostream>
 #include <list>
 
-class iListner{
+class iSubscriber{
   public:
     virtual void NotifyMsg(std::string strMsg)=0;
 };
@@ -9,18 +9,18 @@ class iListner{
 
 class iPublisher{
     public:
-    virtual void subscribe(iListner * subscriber)=0;
-    virtual void unsubscribe(iListner * subscriber)=0;
+    virtual void subscribe(iSubscriber * subscriber)=0;
+    virtual void unsubscribe(iSubscriber * subscriber)=0;
     virtual void OnMessageReceived(std::string strMsg)=0;
 };
 
  
-class subscriber:public iListner{
+class EventListner:public iSubscriber{
     private:
         int id;
         iPublisher * ptrPublisher;
     public:
-      subscriber(int i,iPublisher * ptr):id(i),ptrPublisher(ptr)
+      EventListner(int i,iPublisher * ptr):id(i),ptrPublisher(ptr)
       {
         ptrPublisher->subscribe(this);
       }
@@ -38,19 +38,19 @@ class subscriber:public iListner{
 
 class EventManager: public iPublisher{
     private:
-      std::list<iListner *> lstSubscribers;
+      std::list<iSubscriber *> lstSubscribers;
     public:
-      void subscribe(iListner * subscriber)
+      void subscribe(iSubscriber * subscriber)
       {
           lstSubscribers.push_back(subscriber);
       }
-      void unsubscribe(iListner * subscriber)
+      void unsubscribe(iSubscriber * subscriber)
       {
         lstSubscribers.remove(subscriber);
       }
       void OnMessageReceived(std::string strMsg)
       {
-        for(iListner * iter:lstSubscribers)
+        for(iSubscriber * iter:lstSubscribers)
             iter->NotifyMsg(strMsg);
       }
 };
@@ -61,9 +61,9 @@ int main()
     std::cout<<"Creating Publisher\n";
     iPublisher * ptrEvManager = new EventManager();
     std::cout<<"Creating Subscribers 1,2,3\n";
-    subscriber *s1 = new subscriber(1, ptrEvManager);
-    subscriber *s2 = new subscriber(2, ptrEvManager);
-    subscriber *s3 = new subscriber(3, ptrEvManager);
+    EventListner *s1 = new EventListner(1, ptrEvManager);
+    EventListner *s2 = new EventListner(2, ptrEvManager);
+    EventListner *s3 = new EventListner(3, ptrEvManager);
 
     std::cout<<"Simulating message event\n";
     ptrEvManager->OnMessageReceived("Message X");
